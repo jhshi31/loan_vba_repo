@@ -28,3 +28,25 @@ If ws.Index > 1 Then
     End If
 End If
 End Function
+
+Sub ImportModule(moduleName As String)
+    ' Need to change trust center developer security setting "Trust access
+    ' to project object model" to True
+    Dim wb As Workbook
+    Dim basFile As String
+    Dim vbComp As Object
+
+    Set wb = ThisWorkbook
+    basFile = wb.Path & "\" & moduleName & ".bas"
+
+    ' Remove module if it exists
+    For Each vbComp In wb.VBProject.VBComponents
+        If vbComp.Name = moduleName Then
+            wb.VBProject.VBComponents.Remove vbComp
+            Exit For
+        End If
+    Next vbComp
+
+    ' Add newest version of this module    
+    wb.VBProject.VBComponents.Import basFile
+End Sub

@@ -1,11 +1,15 @@
+Option Explicit
+
 Attribute VB_Name = "CalculatePayments"
 
 
 
-Private Function NumPaymentChangeThisMo() As Double
+Private Function NumPaymentChangeThisMo()
+    Debug.Print "Not Implemented"
 End Function
 
 
 
-Function NumPaymentChangeThisYear() As Double
+Function NumPaymentChangeThisYear()
+    Debug.Print "Not Implemented"
 End Function

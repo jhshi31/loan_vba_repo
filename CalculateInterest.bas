@@ -9,24 +9,26 @@ Private Function InterestDecreaseThisMo(mortgage_payment_cell As Range) As Doubl
     ' end of month
     Dim principal_eom
     ' start of month
-    Dim principal_som
-    Dim principal_payment
-    Dim fixed_rate_principal_eom
-    Dim fixed_rate_principal_payment
-    Dim cost_of_loan
-    Dim fixed_rate_cost_of_loan
+    Dim principal_som As Double
+    Dim principal_payment As Double
+    Dim interest_payment As Double
+    Dim fixed_rate_principal_payment As Double
+    Dim fixed_rate_principal_eom As Double
+    Dim cost_of_loan As Double
+    Dim fixed_rate_cost_of_loan As Double
 
     Application.Volatile
 
     principal_eom = mortgage_payment_cell.Offset(0, -3).Value
     principal_payment = mortgage_payment_cell.Offset(0, -1).Value
     principal_som = principal_eom + principal_payment
-    fixed_rate_principal_payment = fixed_rate_payment - (principal_som * monthly_interest_rate)
+    interest_payment = mortgage_payment_cell.Offset(0, -2).Value
+    fixed_rate_principal_payment = fixed_rate_payment - interest_payment
     fixed_rate_principal_eom = principal_som - fixed_rate_principal_payment
 
-    fixed_rate_cost_of_loan = WorksheetFunction.NPer(monthly_interest_rate, -fixed_rate_payment, _
+    fixed_rate_cost_of_loan = fixed_rate_principal_payment + WorksheetFunction.NPer(monthly_interest_rate, -fixed_rate_payment, _
                                 fixed_rate_principal_eom) * fixed_rate_payment
-    cost_of_loan = WorksheetFunction.NPer(monthly_interest_rate, -fixed_rate_payment, principal_eom) * fixed_rate_payment
+    cost_of_loan = principal_payment + WorksheetFunction.NPer(monthly_interest_rate, -fixed_rate_payment, principal_eom) * fixed_rate_payment
 
     InterestDecreaseThisMo = fixed_rate_cost_of_loan - cost_of_loan
 End Function
@@ -34,20 +36,19 @@ End Function
 
 
 Function InterestDecreaseThisYear() As Double
-    '
-    Dim mortgage_payment_cells
+    Dim curWs As Worksheet
+    Dim curWb As Workbook
+    Dim mortgage_payment_cells As Range
     Dim cell As Range
-    Dim interest_decrease As Double
-    Dim callCell As Range
-    Dim callWs As Worksheet
+    Dim interest_decrease As Double    
 
     Application.Volatile
 
     InitializeConstants
-    Set callCell = Application.Caller
-    Set callWs = callCell.Worksheet
+    Set curWs = Application.Caller.Worksheet
+    Set curWb = curWs.Parent
 
-    Set mortgage_payment_cells = callWs.Range("E9:E20")
+    Set mortgage_payment_cells = curWs.Range("E9:E20")
     interest_decrease = 0
     For Each cell In mortgage_payment_cells
         If cell.Value > fixed_rate_payment Then
@@ -62,12 +63,15 @@ End Function
 
 Function CostOfLoanSoFar() as Double
     '
+    Dim curWs As Worksheet
+    Dim curWb As Workbook
     Dim ws As Worksheet
     Dim cost As Double
 
     Application.Volatile
-    InitializeConstants
 
+    Set curWs = Application.Caller.Worksheet
+    Set curWb = curWs.Parent
     cost = 0
     For Each ws In ThisWorkbook.Sheets
         If ws.Name <> "Info" And ws.Name <> "Analysis" Then 
